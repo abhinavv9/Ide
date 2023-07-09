@@ -1,0 +1,11 @@
+FROM python:alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the script that will retrieve and execute the code
+COPY template.py /app/template.py
+
+# Set the entrypoint to execute the script
+ENTRYPOINT ["python", "/app/template.py"]
+
