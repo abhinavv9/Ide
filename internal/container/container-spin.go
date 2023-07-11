@@ -1,4 +1,4 @@
-package internal
+package container
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	// "github.com/abinavv9/codee/scripts"
+	"github.com/abhinavv9/codee/cmd"
 	"github.com/docker/docker/client"
 )
 
@@ -47,7 +47,7 @@ func SpinContainer(ctx context.Context, cli *client.Client, image string) {
 				}
 
 				//Execute the code passed thru env variable
-				output, err := ExecuteCodeInContainer(ctx, cli, containerID)
+				output, err := cmd.ExecuteCodeInContainer(ctx, cli, containerID)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -55,11 +55,11 @@ func SpinContainer(ctx context.Context, cli *client.Client, image string) {
 				//handle output
 				fmt.Println(string(output))
 
-				// logs, err := getContainerLogs(ctx, cli, containerID)
-				// if err != nil {
-				// 	log.Printf("Error retrieving logs for user %s: %v", job.UserID, err)
-				// 	continue
-				// }
+				logs, err := getContainerLogs(ctx, cli, containerID)
+				if err != nil {
+					log.Printf("Error retrieving logs for user %s: %v", job.UserID, err)
+					continue
+				}
 
 				// memUsage, err := scripts.GetContainerMemoryUsage(ctx, cli, containerID)
 				// if err != nil {
@@ -70,7 +70,7 @@ func SpinContainer(ctx context.Context, cli *client.Client, image string) {
 				// Print container memory usage
 				// log.Printf("Container memory used: %d bytes", memUsage)
 
-				// log.Printf("Container logs for user %s:\n%s\n", job.UserID, logs)
+				log.Printf("Container logs for user %s:\n%s\n", job.UserID, logs)
 
 				err = removeContainer(ctx, cli, containerID)
 				if err != nil {
