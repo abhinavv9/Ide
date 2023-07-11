@@ -7,16 +7,30 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-func setupRoutes(app *fiber.App) {
-	app.Use(logger.New())
+type Server struct {
+	*fiber.App
+}
 
-	// Serve static files from the "public" directory
-	app.Static("/", "./public")
+func NewServer() *Server {
+	app := fiber.New()
+
+	return &Server{
+		App: app,
+	}
+}
+
+func (s *Server) setupRoutes() {
+	s.Use(logger.New())
+
+	// Define your routes here
+	s.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, Fiber!")
+	})
 }
 
 var LogFile = "./logs/log.txt"
 
-func Start() {
+func (s *Server) Start() error {
 	// Open the log file
 	logFile, err := os.OpenFile(LogFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -24,18 +38,12 @@ func Start() {
 	}
 	defer logFile.Close()
 
-	app := fiber.New()
-
-	app.Use(logger.New(logger.Config{
+	s.Use(logger.New(logger.Config{
 		// Set the output file for the logs
 		Output: logFile,
 	}))
-
-	setupRoutes(app)
+	s.setupRoutes()
 
 	// Start the server on port 3000
-	err = app.Listen(":3000")
-	if err != nil {
-		panic(err)
-	}
+	return s.Listen(":3000")
 }

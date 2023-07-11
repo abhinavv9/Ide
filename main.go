@@ -1,8 +1,6 @@
 package main
 
 import (
-	// "context"
-	"fmt"
 	// "log"
 	// "time"
 
@@ -12,8 +10,11 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting server...")
-	cmd.Start()
+	server := cmd.NewServer()
+
+	if err := server.Start(); err != nil {
+		panic(err)
+	}
 }
 
 // func main() {
