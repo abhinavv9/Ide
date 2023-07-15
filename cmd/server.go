@@ -1,15 +1,17 @@
 package cmd
 
 import (
+	"context"
+	"log"
 	"os"
 
+	"github.com/abhinavv9/codee/middleware"
+	"github.com/abhinavv9/codee/routes"
+	"github.com/abhinavv9/codee/types"
+	"github.com/docker/docker/client"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
-
-type Server struct {
-	*fiber.App
-}
 
 func NewServer() *Server {
 	app := fiber.New()
@@ -22,15 +24,26 @@ func NewServer() *Server {
 func (s *Server) setupRoutes() {
 	s.Use(logger.New())
 
-	// Define your routes here
-	s.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, Fiber!")
-	})
+	s.Post("/execute", middleware.JobMiddleware(), routes.CodeExecutionRoute)
+
 }
 
 var LogFile = "./logs/log.txt"
 
-func (s *Server) Start() error {
+func (s *types.Server) Start() error {
+
+	//Setting up docker client and context
+	ctx := context.Background()
+
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Set the docker client and context
+	s.DockerClient = cli
+	s.Ctx = ctx
+
 	// Open the log file
 	logFile, err := os.OpenFile(LogFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -45,5 +58,5 @@ func (s *Server) Start() error {
 	s.setupRoutes()
 
 	// Start the server on port 3000
-	return s.Listen(":3000")
+	return s.Listen(":5000")
 }

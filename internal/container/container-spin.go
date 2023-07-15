@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"sync"
 
-	"github.com/abhinavv9/codee/cmd"
+	"github.com/abhinavv9/codee/internal"
 	"github.com/docker/docker/client"
 )
 
@@ -47,7 +46,7 @@ func SpinContainer(ctx context.Context, cli *client.Client, image string) {
 				}
 
 				//Execute the code passed thru env variable
-				output, err := cmd.ExecuteCodeInContainer(ctx, cli, containerID)
+				output, err := internal.ExecuteCodeInContainer(ctx, cli, containerID)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -87,31 +86,6 @@ func SpinContainer(ctx context.Context, cli *client.Client, image string) {
 		close(doneCh)
 	}()
 
-	// Simulate multiple users submitting code jobs
-	users := []string{"user1"} // Add more users as needed
-	// filePath := "job1.py"
-
-	// Read the content of the file
-	code, err := os.ReadFile("E:/webdev/Golang/Ide/codee/jobs/py/job1.py")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	codeStr := string(code)
-	// codeStr := "print('hello, world!!')"
-
-	for _, user := range users {
-		job := Job{
-			UserID: user,
-			Code:   codeStr, // Replace with the user's code
-		}
-
-		jobCh <- job
-	}
-
-	close(jobCh) // Close the job channel to indicate no more jobs
-
 	// Wait for all workers to complete
 	<-doneCh
-
 }
