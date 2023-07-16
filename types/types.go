@@ -13,9 +13,4 @@ type Job struct {
 	Lang   string
 	Image  string
 }
-
-type Server struct {
-	*fiber.App
-	DockerClient *client.Client
-	Ctx          context.Context
-}
+l

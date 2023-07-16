@@ -10,19 +10,27 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) string {
+type Error struct {
+    run error
+    execute error
+}
+
+func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) (string, Error) {
     var output string;
+    errs := Error{}
 
     go func() {
         //Start the container
         containerID, err := runContainer(ctx, cli, job.Code, job.Image)
         if err != nil {
+            errs.run = err
             log.Printf("Error running container for user %s: %v", job.UserID, err)
         }
 
         //Execute the code passed thru env variable
         outputBytes, err := internal.ExecuteCodeInContainer(ctx, cli, containerID)
         if err != nil {
+            errs.execute = err
             log.Fatal(err)
         }
 
@@ -54,7 +62,7 @@ func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) strin
 
     }()
 
-    return output
+    return output, errs
 
 }
 

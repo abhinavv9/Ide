@@ -2,7 +2,10 @@ module github.com/abhinavv9/codee
 
 go 1.20
 
-require github.com/docker/docker v24.0.3+incompatible
+require (
+	github.com/docker/docker v24.0.3+incompatible
+	github.com/gofiber/fiber/v2 v2.47.0
+)
 
 require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
@@ -10,7 +13,6 @@ require (
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/gofiber/fiber/v2 v2.47.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/klauspost/compress v1.16.3 // indirect
