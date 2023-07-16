@@ -10,7 +10,8 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) {
+func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) string {
+    var output string;
 
     go func() {
         //Start the container
@@ -20,10 +21,12 @@ func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) {
         }
 
         //Execute the code passed thru env variable
-        output, err := internal.ExecuteCodeInContainer(ctx, cli, containerID)
+        outputBytes, err := internal.ExecuteCodeInContainer(ctx, cli, containerID)
         if err != nil {
             log.Fatal(err)
         }
+
+        output = string(outputBytes)
 
         //handle output
         fmt.Println(string(output))
@@ -50,6 +53,9 @@ func SpinContainer(ctx context.Context, cli *client.Client, job types.Job) {
         }
 
     }()
+
+    return output
+
 }
 
 
